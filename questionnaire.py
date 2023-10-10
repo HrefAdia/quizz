@@ -68,7 +68,7 @@ class Questionnaire:
     
     def extract_json_data(data):
         questionnaires = questionnaire_data["questions"]
-        questions = [Question.FromData(question) for question in questionnaires]
+        questions = [Question.extract_question(question) for question in questionnaires]
         
         return Questionnaire(questions, data["categorie"], data["titre"], data["difficulte"])
 
@@ -77,14 +77,15 @@ class Questionnaire:
         score = 0
         nb_questions = len(self.questions)
 
-        print("-----")
+        print("*"*20)
         print("QUESTIONNAIRE : " + self.titre)
         print("  Categorie : " + self.categorie)
         print("  Difficulte : " + self.difficulte)
         print("  Nombre de questions : " + str(nb_questions))
-        print("-----")
+        print("*"*20)
 
         for i in range(nb_questions):
+
             question = self.questions[i]
             if question.poser():
                 score += 1
