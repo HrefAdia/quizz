@@ -4,13 +4,12 @@ import unicodedata
 
 
 open_quizz_db_data = (
+    ("Animaux", "Abeilles du rucher", "https://download.openquizzdb.org/3237473974/OpenQuizzDB_237/openquizzdb_237.json"),
     ("Animaux", "Les chats", "https://www.codeavecjonathan.com/res/mission/openquizzdb_50.json"),
     ("Arts", "Musée du Louvre", "https://www.codeavecjonathan.com/res/mission/openquizzdb_86.json"),
-    #-***********data inexistant pour cet url
-    """ ("Bande dessinnée", "Tintin", "https://www.kiwime.com/oqdb/files/2124627384/OpenQuizzDB_124/openquizzdb_124.json"), """
-    #****
     ("Cinéma", "Alien", "https://www.codeavecjonathan.com/res/mission/openquizzdb_241.json"),
     ("Cinéma", "Star wars", "https://www.codeavecjonathan.com/res/mission/openquizzdb_90.json"),
+    
 )
 
 
@@ -52,7 +51,7 @@ def generate_json_file(categorie, titre, url):
                 file.write(out_json)
                 file.close()
                 print("end")
-        # exception si reponse 200 mais data non recuperable
+        # exception si reponse 200 mais data non utilisable 
         except:
             print("données introuvables : " + url)
 

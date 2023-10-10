@@ -1,14 +1,17 @@
 import json
+import sys
 
-#*** Création du quizz avec un seul fichier pour tester les différentes fonctionnalités ***
-filename = "animaux_leschats_confirme.json"
+#---------------------              Le Quizz    ---------------------------------          
 
+#filename = "animaux_leschats_confirme.json"
+#filename = "animaux_abeillesdurucher_confirme.json"
+""" 
 with open(filename, "r") as file:
     json_data = file.read()
 
 questionnaire_data = json.loads(json_data)
-
-# *****************************************************************
+"""
+# ********************************************************************************
 
 class Question:
     def __init__(self, titre, choix, bonne_reponse):
@@ -21,9 +24,12 @@ class Question:
         titre = data["titre"]
         choix = [i[0] for i in data["choix"]]
         bonne_reponse = [i[0] for i in data["choix"] if i[1]] 
-            #print(bonne_reponse) c'est une liste donc on prend le premier item
+        # Si la réponse n'est pas fournie ou s'il y a plusieurs réponses : on ajoute pas la question !
+        if len(bonne_reponse) != 1:
+            return None
         #Instanciation de la question 
         q = Question(titre, choix, bonne_reponse[0])
+         #print(bonne_reponse) #==> on obtient une liste donc on prend le premier item
             
         return q
 
@@ -67,10 +73,25 @@ class Questionnaire:
 
     
     def extract_json_data(data):
-        questionnaires = questionnaire_data["questions"]
+        questionnaires = data["questions"]
         questions = [Question.extract_question(question) for question in questionnaires]
+        # Ignore les questions non construits (None)
+        questions = [question for question in questions if question]
         
         return Questionnaire(questions, data["categorie"], data["titre"], data["difficulte"])
+    
+    # Pour lancer directement le questionnaire à partir d'un fichier Json
+    def questionnaire_from_json_file(filename):
+        try:
+            with open(filename, "r") as file:
+                json_data = file.read()
+            questionnaire_data = json.loads(json_data)
+            #questionnaires = questionnaire_data["questions"]
+        except:
+            print("Erreur lors de l'ouverture ou à la lecture du fichier")
+            return None
+
+        return Questionnaire.extract_json_data(questionnaire_data).lancer()
 
 
     def lancer(self):
@@ -94,5 +115,20 @@ class Questionnaire:
         print("Score final :", score, "sur", len(self.questions))
         return score
 
-# Lancemant du questionnaire
-Questionnaire.extract_json_data(questionnaire_data).lancer()
+
+#*******************   Lancemant du questionnaire ********************** 
+# 1 Lancement en directe
+#filename = "animaux_abeillesdurucher_confirme.json"
+#Questionnaire.questionnaire_from_json_file(filename).lancer()
+
+# 2 Lancement en ligne de commande
+
+if len(sys.argv) < 2:
+    print("ERREUR : Vous devez spécifier le nom du fichier json à charger")
+    exit(0)
+
+filename = sys.argv[1]
+questionnaire = Questionnaire.questionnaire_from_json_file(filename)
+if questionnaire:
+    questionnaire.lancer()
+
