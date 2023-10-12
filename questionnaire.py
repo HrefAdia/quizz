@@ -3,14 +3,6 @@ import sys
 
 #---------------------              Le Quizz    ---------------------------------          
 
-#filename = "animaux_leschats_confirme.json"
-#filename = "animaux_abeillesdurucher_confirme.json"
-""" 
-with open(filename, "r") as file:
-    json_data = file.read()
-
-questionnaire_data = json.loads(json_data)
-"""
 # ********************************************************************************
 
 class Question:
@@ -73,10 +65,26 @@ class Questionnaire:
 
     
     def extract_json_data(data):
+        if not data.get("questions"):
+            return None
+
         questionnaires = data["questions"]
         questions = [Question.extract_question(question) for question in questionnaires]
         # Ignore les questions non construits (None)
         questions = [question for question in questions if question]
+
+        # ---------  Ajout suite test unitaire negatif  sur le format des donnees
+        # Permet de creer le questionnaire meme sans categorie et difficulté 
+        if not data.get("categorie"):
+            data["categorie"] = "inconnue"
+
+        if not data.get("difficulte"):
+            data["difficulte"] = "inconnue"
+
+        if not data.get("titre"):
+            return None
+        
+        # ------- Fin  Ajout suite tests negatif  sur le format
         
         return Questionnaire(questions, data["categorie"], data["titre"], data["difficulte"])
     
@@ -91,7 +99,7 @@ class Questionnaire:
             print("Erreur lors de l'ouverture ou à la lecture du fichier")
             return None
 
-        return Questionnaire.extract_json_data(questionnaire_data).lancer()
+        return Questionnaire.extract_json_data(questionnaire_data)
 
 
     def lancer(self):
@@ -116,19 +124,24 @@ class Questionnaire:
         return score
 
 
-#*******************   Lancemant du questionnaire ********************** 
-# 1 Lancement en directe
-#filename = "animaux_abeillesdurucher_confirme.json"
-#Questionnaire.questionnaire_from_json_file(filename).lancer()
 
-# 2 Lancement en ligne de commande
+#*******************   Lancemant du questionnaire   ********************** 
 
-if len(sys.argv) < 2:
-    print("ERREUR : Vous devez spécifier le nom du fichier json à charger")
-    exit(0)
+if __name__ == "__main__":
 
-filename = sys.argv[1]
-questionnaire = Questionnaire.questionnaire_from_json_file(filename)
-if questionnaire:
-    questionnaire.lancer()
+    # 1 Lancement en directe
+    #filename = "animaux_abeillesdurucher_confirme.json"
+    #filename = "animaux_leschats_confirme.json"
+    #Questionnaire.questionnaire_from_json_file(filename).lancer()
+
+    # 2 Lancement en ligne de commande
+
+    if len(sys.argv) < 2:
+        print("ERREUR : Vous devez spécifier le nom du fichier json à charger")
+        exit(0)
+
+    filename = sys.argv[1]
+    questionnaire = Questionnaire.questionnaire_from_json_file(filename)
+    if questionnaire:
+        questionnaire.lancer()
 
